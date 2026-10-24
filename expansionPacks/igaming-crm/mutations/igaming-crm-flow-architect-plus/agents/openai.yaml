@@ -1,0 +1,7 @@
+interface:
+  display_name: "igaming-crm-flow-architect-plus"
+  short_description: "iGaming CRM Flow Architect Plus (Beta): build, smoke-test and audit iGaming CRM in Customer.io."
+  default_prompt: "Use $igaming-crm-flow-architect-plus to build this iGaming CRM design in Customer.io as drafts, with a dry run and my approval per stage."
+
+policy:
+  allow_implicit_invocation: false

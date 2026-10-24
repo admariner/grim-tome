@@ -1,0 +1,17 @@
+alias: igaming-crm
+display_name: iGaming CRM (admariner)
+source_url: claude.ai account skill igaming-crm-flow-architect-plus v1.2.0 (no public URL)
+license: MIT
+license_file: LICENSE
+invocation: upstream
+skills:
+  og: []
+  mutations:
+    - slug: igaming-crm-flow-architect-plus
+      pack_id: igaming-crm:igaming-crm-flow-architect-plus
+      canonical_id: igaming-crm-flow-architect-plus
+      path: mutations/igaming-crm-flow-architect-plus
+      description: Build, smoke-test and audit iGaming CRM in a Customer.io workspace through the official Customer.io MCP, drafts only, with responsible-gambling exits.
+      lifecycle: beta
+      public_safe: true
+      mutation: true

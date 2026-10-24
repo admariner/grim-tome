@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "stale_after_days": 180,
+  "about": "Validator fixture: rows verified long ago, to prove C27 warns without failing. Run good.md with --markets DE --markets-file scripts/fixtures/markets-stale.json; expect exit 0 and a C27 warning.",
+  "markets": {
+    "DE": {
+      "name": "Germany",
+      "regulator": "GGL",
+      "market_status": "open",
+      "register": "OASIS",
+      "api_check": true,
+      "consent": {"per_product_per_channel": false, "products": ["betting", "casino"], "channels": ["email"], "notes": ""},
+      "bonus_rules": {"max_wagering_multiplier": null, "single_product": false, "first_play_only": false, "deposit_conditional_allowed": null, "notes": ""},
+      "time_windows": [],
+      "helpline": {"name": "BIÖG", "number": "0800 1372700", "url": ""},
+      "source_url": [],
+      "verified_on": "2025-01-01",
+      "status": "secondary",
+      "unverified_fields": ["helpline"],
+      "notes": "stale on purpose"
+    },
+    "UK": {
+      "name": "United Kingdom",
+      "regulator": "Gambling Commission",
+      "market_status": "open",
+      "register": "GAMSTOP",
+      "api_check": true,
+      "consent": {"per_product_per_channel": true, "products": ["betting", "casino", "bingo"], "channels": ["email", "sms", "phone"], "notes": ""},
+      "bonus_rules": {"max_wagering_multiplier": 10, "single_product": true, "first_play_only": false, "deposit_conditional_allowed": null, "notes": ""},
+      "time_windows": [],
+      "helpline": {"name": "National Gambling Helpline", "number": "0808 8020 133", "url": ""},
+      "source_url": [],
+      "verified_on": "2025-01-01",
+      "status": "primary",
+      "unverified_fields": ["helpline"],
+      "notes": "stale on purpose"
+    }
+  }
+}
