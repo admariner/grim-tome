@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workspace Audit Ledger</title>
+<!--
+Skeleton for the HTML rendering of a LIVE-AUDIT ledger. The markdown ledger
+(templates/live-audit-findings.md) is canonical; this page shows the same
+content and nothing more. Fill only the JSON in #ledger-data: header fields,
+facts, notEvidenced, sections, effects and findings. No player data, ever.
+Link patterns, docs and the agent and verify preambles are in
+protocols/live-audit.md, "Ledger reference"; "host" is the region's app host.
+-->
+<style>
+:root{--bg:#f3f5f8;--surface:#fff;--sunk:#e9edf2;--ink:#141c26;--muted:#56616e;--line:#d7dde5;
+--accent:#1d4ccc;--accent-ink:#fff;--accent-soft:#e3eafb;
+--pp:#b8322a;--pp-soft:#fbe7e5;--co:#a8650a;--co-soft:#fbefdc;--rev:#24735f;--rev-soft:#dff1ea;--hy:#5f6874;--hy-soft:#e8ebef;
+--f-body:system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f141b;--surface:#161d26;--sunk:#1d2631;--ink:#e6ebf1;--muted:#9aa5b2;--line:#2a3542;
+--accent:#7ea2ff;--accent-ink:#0b1220;--accent-soft:#1c2a4a;--pp:#ff7a6e;--pp-soft:#3a1d1b;--co:#f0b252;--co-soft:#37290f;--rev:#5fd1ad;--rev-soft:#123228;--hy:#a4adb8;--hy-soft:#232c37;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f141b;--surface:#161d26;--sunk:#1d2631;--ink:#e6ebf1;--muted:#9aa5b2;--line:#2a3542;
+--accent:#7ea2ff;--accent-ink:#0b1220;--accent-soft:#1c2a4a;--pp:#ff7a6e;--pp-soft:#3a1d1b;--co:#f0b252;--co-soft:#37290f;--rev:#5fd1ad;--rev-soft:#123228;--hy:#a4adb8;--hy-soft:#232c37;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--f-body);padding:28px 16px 64px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;gap:24px}
+a{color:var(--accent)}
+.eyebrow{font:12px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.05;margin:6px 0}
+.lede,.note,.sd,footer{color:var(--muted);max-width:78ch}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--ink)}
+.band,.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--sunk)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:12px;font-size:13px}
+.legend b{font-size:22px;margin-right:6px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--line);z-index:5}
+.chip{font:500 13px var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.gl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.card{position:relative;padding-left:22px;display:grid;gap:10px;margin-top:12px}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:10px 0 0 10px;background:var(--stripe)}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pn{font-weight:800;font-size:20px}
+.pill{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+.risk{background:var(--rs);color:var(--stripe)}.owner{background:var(--accent-soft);color:var(--accent)}
+.area{font-size:12px;color:var(--muted);text-transform:uppercase}
+h2{font-size:18px;margin:0}h3{font-size:clamp(22px,3.4vw,28px);margin:18px 0 4px}
+dl{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 14px;margin:0}
+dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}dd{margin:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;border-top:1px dashed var(--line);padding-top:12px}
+.cb{font:600 13px var(--f-body);padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--sunk);color:var(--ink);cursor:pointer}
+.cb.agent{border-color:var(--accent)}.cb.done{border-color:var(--rev);color:var(--rev)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px}
+@media (max-width:560px){dl{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title"></h1>
+    <p class="lede" id="lede"></p>
+    <div class="facts" id="facts"></div>
+  </header>
+  <section class="band" aria-label="Findings by risk">
+    <div class="bar" id="bar"></div><div class="legend" id="legend"></div>
+    <p class="note" id="notev"></p>
+  </section>
+  <div class="controls" role="toolbar" aria-label="Filter findings">
+    <span class="gl">Risk</span><span id="riskChips"></span>
+    <span class="gl">Owner</span><span id="ownerChips"></span>
+  </div>
+  <main id="list"></main>
+  <footer id="footer"></footer>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script type="application/json" id="ledger-data">
+{
+  "eyebrow": "Live audit · Customer.io [[REGION]] · workspace [[WORKSPACE_ID]] · [[ENVIRONMENT]] · [[YYYY-MM-DD]]",
+  "title": "Workspace [[WORKSPACE_ID]] audit",
+  "lede": "[[LEDE]]",
+  "facts": ["[[N]] automations ([[N]] running)", "[[N]] sent broadcasts", "[[N]] segments", "[[N]] frequency caps", "[[N]] topics", "[[N]] profiles", "Nothing was written to the workspace"],
+  "notEvidenced": "Not evidenced: [[ITEMS]]",
+  "agentPreamble": "[[AGENT_TASK_PREAMBLE from the Ledger reference]]",
+  "verifyPreamble": "[[VERIFY_PREAMBLE from the Ledger reference]]",
+  "sections": [
+    {"id": "audit", "prefix": "P", "title": "Configuration audit", "desc": "Automations, broadcasts, segments, caps, topics and webhooks against the player-protection rules."},
+    {"id": "explore", "prefix": "X", "title": "Data exploration", "desc": "[[What the profile and delivery data show, or: Data exploration skipped: REASON]]"}
+  ],
+  "effects": ["[[P_LABEL]]: [[EFFECT]]"],
+  "findings": [
+    {"label": "P1", "risk": "player-protection", "owner": "CRM Manager", "area": "[[AREA]]", "title": "[[TITLE]]",
+     "objects": [{"label": "Automation [[ID]]", "url": "[[HOST]]/workspaces/[[WORKSPACE_ID]]/journeys/automations/[[ID]]/overview"}],
+     "finding": "[[FINDING]]", "fix": "[[FIX]]",
+     "docs": [{"label": "Exit conditions", "url": "https://docs.customer.io/journeys/send/campaigns/exit-conditions/"}],
+     "data": [], "steps": ["[[STEP]]"], "done": ["[[CHECK]]"],
+     "agentTask": ["Read [[CIO_SKILL]] with cio_skills_read.", "GET [[OBJECT]] in full.", "Prepare [[CHANGE]] with dry_run true.", "Show me the preview and wait for my approval. Do not change the automation state."],
+     "verify": ["GET [[PATH]]: [[FIELD]] must [[VALUE]]."]}
+  ],
+  "footer": ["Agent prompts assume a Claude session connected to the Customer.io MCP ([[REGION]]). Every task prompt asks for a dry run and your approval before any write, and none of them starts, stops, sends or deletes anything.",
+    "Legal/compliance review required: have qualified legal and compliance counsel review this design in every target jurisdiction before deployment."]
+}
+</script>
+<script>
+(function(){
+const L=JSON.parse(document.getElementById('ledger-data').textContent);
+const RISK={'player-protection':['Player protection','--pp','--pp-soft'],compliance:['Compliance','--co','--co-soft'],revenue:['Revenue','--rev','--rev-soft'],hygiene:['Hygiene','--hy','--hy-soft']};
+const ROLES=['Compliance & RG Officer','CRM Manager','Backend Engineer','Fraud & AML Analyst'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const F=L.findings,BTN=new Map();let fr='all',fo='all';
+$('eyebrow').textContent=L.eyebrow;$('title').textContent=L.title;$('lede').textContent=L.lede;
+$('facts').innerHTML=L.facts.map(f=>'<span>'+esc(f).replace(/^(\d[\d,]*)/,'<b>$1</b>')+'</span>').join('');
+$('notev').textContent=L.notEvidenced;$('footer').innerHTML=L.footer.map(t=>'<div>'+esc(t)+'</div>').join('');
+const n={};F.forEach(f=>n[f.risk]=(n[f.risk]||0)+1);
+$('bar').innerHTML=Object.keys(RISK).map(r=>n[r]?'<span style="width:'+(n[r]/F.length*100)+'%;background:var('+RISK[r][1]+')"></span>':'').join('');
+$('legend').innerHTML=Object.keys(RISK).map(r=>'<span><b>'+(n[r]||0)+'</b>'+RISK[r][0]+'</span>').join('')+'<span><b>'+F.length+'</b>findings</span>';
+const links=xs=>(xs||[]).map(o=>'<a href="'+esc(o.url)+'" target="_blank" rel="noopener">'+esc(o.label)+'</a>').join(' · ');
+const num=xs=>xs.map((s,i)=>(i+1)+'. '+s).join('\n');
+function texts(f){const t=[['Instructions','To: '+f.owner+'\nRe: '+f.label+' '+f.title+'\n\nWhat we found\n'+f.finding+'\n\nWhat to do\n'+num(f.steps)+'\n\nRisk: '+RISK[f.risk][0]+'. Please confirm when done.'],
+ ['Checklist','Checklist for '+f.label+': '+f.title+'\nOwner: '+f.owner+'\n\n'+f.done.map(c=>'- [ ] '+c).join('\n')]];
+ if(f.agentTask)t.push(['Agent task',L.agentPreamble+'\n\nTask '+f.label+': '+f.title+'\nGoal: '+f.fix+'\n\nSteps\n'+num(f.agentTask),1]);
+ if(f.verify)t.push(['Verify (read-only)',L.verifyPreamble+'\n\nVerify '+f.label+': '+f.title+'\nExpected: '+f.fix+'\n\nChecks\n'+num(f.verify),1]);return t;}
+function card(f){const r=RISK[f.risk];const b=texts(f);b.forEach((x,i)=>BTN.set(f.label+i,x[1]));
+ return '<article class="card" id="'+f.label+'" style="--stripe:var('+r[1]+');--rs:var('+r[2]+')"><div class="head"><span class="pn">'+f.label+'</span><span class="pill risk">'+r[0]+'</span><span class="pill owner">'+esc(f.owner)+'</span><span class="area">'+esc(f.area)+'</span></div><h2>'+esc(f.title)+'</h2><dl><dt>Objects</dt><dd>'+(links(f.objects)||'none')+'</dd><dt>Finding</dt><dd>'+esc(f.finding)+'</dd><dt>Fix</dt><dd>'+esc(f.fix)+'</dd><dt>Docs</dt><dd>'+(links(f.docs)||'none')+'</dd>'+(f.data&&f.data.length?'<dt>Data</dt><dd>'+links(f.data)+'</dd>':'')+'</dl><div class="btns">'+b.map((x,i)=>'<button type="button" class="cb'+(x[2]?' agent':'')+'" data-id="'+f.label+i+'">'+x[0]+'</button>').join('')+'</div></article>';}
+function chips(){const c=(g,v,l,cur)=>'<button class="chip" type="button" data-g="'+g+'" data-v="'+esc(v)+'" aria-pressed="'+(cur===v)+'">'+esc(l)+'</button>';
+ $('riskChips').innerHTML=c('r','all','All',fr)+Object.keys(RISK).map(r=>c('r',r,RISK[r][0]+' '+(n[r]||0),fr)).join('');
+ $('ownerChips').innerHTML=c('o','all','All',fo)+ROLES.map(o=>c('o',o,o+' '+F.filter(f=>f.owner===o).length,fo)).join('');}
+function render(){const rows=F.filter(f=>(fr==='all'||f.risk===fr)&&(fo==='all'||f.owner===fo));
+ $('list').innerHTML=L.sections.map(s=>{const rs=rows.filter(f=>f.label[0]===s.prefix);const all=F.filter(f=>f.label[0]===s.prefix).length;
+  return '<section id="'+s.id+'"><h3>'+esc(s.title)+', '+all+' findings</h3><p class="sd">'+esc(s.desc)+'</p>'+(s.prefix==='X'&&L.effects.length?'<ul class="note">'+L.effects.map(e=>'<li>'+esc(e)+'</li>').join('')+'</ul>':'')+(rs.map(card).join('')||'<p class="note">No findings match these filters.</p>')+'</section>';}).join('');}
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>el.hidden=true,2000);}
+function copy(text,btn){const ok=()=>{toast('Copied');btn.classList.add('done');setTimeout(()=>btn.classList.remove('done'),1500);};
+ const fb=()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(_){}ta.remove();r?ok():toast('Copy was blocked');};
+ try{navigator.clipboard.writeText(text).then(ok,fb)}catch(_){fb()}}
+document.addEventListener('click',e=>{const c=e.target.closest('.chip');if(c){c.dataset.g==='r'?fr=c.dataset.v:fo=c.dataset.v;chips();render();return;}
+ const b=e.target.closest('.cb');if(b)copy(BTN.get(b.dataset.id),b);});
+chips();render();
+})();
+</script>
+</body>
+</html>

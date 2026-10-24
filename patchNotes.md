@@ -8,6 +8,7 @@ Public changelog for Grimoire's Tome releases
 - New beta expansion pack: [pstack](expansionPacks/pstack/) by poteto (MIT). `/create-verification-skill` generates a project-local verify skill that drives your app like a user and proves it once; `/maintain-verification-skill` keeps its feature map honest; `/how` explains a subsystem; `/why` digs up the reasons behind code with cited evidence.
 - The pack keeps upstream invocation names and is manual-only while in beta. References to the rest of pstack (model rule, Cursor-only tool names) were rewritten so each skill stands alone; changes are listed in the pack README.
 - New beta expansion pack: [Anatomy](expansionPacks/anatomy/) by @wheresryan22 (MIT). `/anatomy` turns a one-line idea into a crafted, interactive isometric machine figure, with optional WebGL shaders and a 3D mode. Installed unmodified apart from frontmatter; manual-only while in beta.
+- New beta expansion pack: [iGaming CRM](expansionPacks/igaming-crm/) (MIT). `/igaming-crm-flow-architect-plus` designs casino and sportsbook CRM, builds it in Customer.io as drafts with responsible-gambling exits, smoke-tests the suppression gate with parked synthetic players, and audits a live workspace read-only. It never activates, sends or deletes: the goblins hand you the keys and step back. Manual-only while in beta; the claude.ai account skill stays the source of truth.
 
 ## v1.1.8 (2026-10-03)
 
