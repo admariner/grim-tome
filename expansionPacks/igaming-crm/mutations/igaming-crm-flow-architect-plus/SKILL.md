@@ -1,6 +1,6 @@
 ---
 name: "igaming-crm-flow-architect-plus"
-description: "Builds, smoke-tests and audits iGaming CRM in a Customer.io workspace through the official Customer.io MCP. Turns a casino or sportsbook CRM design (suppression gate, segments, topics, frequency caps, webhooks, journeys) into workspace objects in a safe, idempotent order, leaves every automation in draft with responsible-gambling exits, writes a build sheet and rollback list, proves the gate with parked synthetic profiles, and audits a live workspace read-only. Can produce the design first. Use when the user asks to build, implement, deploy, push or create a CRM blueprint, segment set, suppression gate or journey in Customer.io, to turn a blueprint into automations, to smoke-test or verify a build or a live gate, or to audit a gambling operator's live Customer.io workspace. Do not use for pure design requests with no workspace involved (igaming-crm-flow-architect), Customer.io troubleshooting such as a failing webhook or delivery, or drafting email copy or templates."
+description: "Builds, smoke-tests and audits iGaming (casino, sportsbook) CRM in a Customer.io workspace through the official Customer.io MCP, and drives the Customer.io and customerio-pack plugins' skills and commands under iGaming rules. Turns a CRM design (suppression gate, segments, topics, frequency caps, webhooks, journeys) into workspace objects in a safe, idempotent order, leaves automations in draft with responsible-gambling exits, writes a build sheet and rollback list, proves the gate with parked synthetic profiles, and audits a live workspace read-only. Can produce the design first. Use when the user asks to build, deploy or create a CRM blueprint, segment set, suppression gate or journey in Customer.io, to smoke-test a build or live gate, to audit, health-check or report on a gambling operator's Customer.io workspace, or to brief its backend team. Not for pure design with no workspace (igaming-crm-flow-architect), or generic Customer.io troubleshooting or SDK setup (customerio-pack)."
 license: MIT
 compatibility: Requires the official Customer.io MCP server (cio_* tools) for BUILD and LIVE-AUDIT; design modes work without it.
 disable-model-invocation: true
@@ -90,15 +90,65 @@ every such account without the staff flag as its own hygiene finding. Detail:
 data-analyst skill when one is installed, and says why when it is skipped
 (`references/data-packs.md`).
 
-## Smoke test
-SMOKE proves, with a few parked synthetic `smk-<run>-` profiles, that the gate
-segments put each kind of player on the right side and that each draft
-marketing automation would admit the eligible player and refuse the
-suppressed one, without starting, sending or deleting anything. It does not
-replace the manual QA matrix in `references/qa-launch.md`. Steps S1-S8
-(workspace and identifier check, role map, structural checks, gate cases
-G1-G11 and journey pairs, collision pre-flight, create, observe, park, report
-in `SMOKE-REPORT.md` beside the build sheet): `protocols/smoke.md`.
+## UI deep links (every mode)
+This table replaces the "Link patterns" table in `protocols/live-audit.md`
+and any link in a fixture or template. HOST is always
+`https://fly.customer.io`, in every region (EU workspaces too; never
+`eu.fly.customer.io`, and never the API base URL). WS is the workspace ID.
+Object pages end in `/overview`, never at the bare ID.
+
+| Object | URL |
+|---|---|
+| Automation | HOST/workspaces/WS/journeys/automations/ID/overview |
+| Broadcast | HOST/workspaces/WS/journeys/broadcasts/newsletter/ID/overview |
+| Segment | HOST/workspaces/WS/journeys/segments/ID/overview |
+| Segment people | HOST/workspaces/WS/journeys/segments/ID/people |
+| Frequency caps | HOST/workspaces/WS/settings/actions/message_frequency_limits |
+
+Build every link, and every link inside a copied prompt, from one set of
+builders, and before delivery check that no link ends at a bare numeric ID
+and none starts with another host. Spreadsheets and data files use the same
+patterns.
+
+## Customer.io plugins (every mode)
+Precedence: these hard rules, then this skill's protocols, then the live
+Customer.io skills (`cio_skills_read`), then the official `customerio`
+plugin, then the community `customerio-pack` (generic SaaS, `customerio-node`
+code, not RG-aware). Load a plugin skill or command only for the step it
+serves here; this skill keeps naming, approvals and the iGaming policy.
+
+| Step | Plugin skill or command | This skill adds |
+|---|---|---|
+| First call, any workspace mode | `customerio:customerio`: `cio_prime` first, one Customer.io MCP server only, OAuth, never handle keys | Workspace chosen every run (rule 2); use whichever server the session has |
+| BUILD 0, LIVE-AUDIT 1 | `/customerio:workspace-health` (recipes/diagnosing_workspace_health.md, fly-api/deliverability.md, fly-api/pipeline_health.md), read-only | BUILD reads headings unless an alert fires; LIVE-AUDIT files alerts as P findings |
+| BUILD 4-5 | `/customerio:build-segment` steps 2-3 (condition syntax, names exist) | SEG_ name, find by name, allowance check, one preview and approval per stage, not per segment |
+| BUILD 8 | `customerio:customerio-journeys` (fly-api) | `references/build-order.md`; never `cio_delete_api` |
+| LIVE-AUDIT 2b | `/customerio:campaign-report` (recipes/analyzing_automations.md, fly-api/automation_metrics.md) per running automation and sent broadcast | X findings; staff and test accounts apart; date range stated |
+| Journey emails, on request | `/customerio:draft-email`, `customerio:customerio-design-studio` (email_patterns, email_review.md) | Draft only, never publish or wire; content rubric (`references/kpis-and-testing.md`), market overlays, RG line, offer terms, topic unsubscribe |
+| Data in | `customerio:customerio-pipelines` (cdp-api), `customerio:customerio-sdk` (cio, mobile-sdk) | Attributes and events from `references/data-model.md` and `references/event-taxonomy.md` |
+| Backend hand-offs (owner Backend Engineer) | customerio-pack: known-pitfalls, webhooks-events, security-basics, rate-limits, reliability-patterns, multi-env-setup, prod-checklist | Cited in owner steps with the overrides below; never run against a workspace |
+| Send, webhook or 4xx troubleshooting | customerio-pack: common-errors, advanced-troubleshooting, debug-bundle; recipes/diagnosing_a_failure.md | Back here when the fix touches gate, exits, caps or topics |
+
+The other customerio-pack skills are engineering references for the
+operator's developers; their tests use a sandbox workspace and synthetic
+profiles, never production players. Where a plugin says otherwise, these win:
+- No `suppress`, `destroy`, merge or delete of a person: not for bounces
+  (webhooks-events; the workspace already suppresses hard bounces, so record
+  `email_bounced` only), not for inactive profiles (cost-tuning), not for
+  erasure requests (security-basics; route them to compliance, because RG and
+  AML records carry licence retention duties). A merge must keep the
+  strictest RG values, so it belongs to the backend.
+- Reporting-webhook signature: HMAC-SHA256 with the signing secret over
+  `v0:<X-CIO-Timestamp>:<raw body>`, compared with `X-CIO-Signature`
+  (docs.customer.io/integrations/api/webhooks). The pack hashes the body
+  alone and rejects valid deliveries; confirm hex or base64 on a test delivery.
+- Rate limits are those in `references/platform-implementation.md`, not the
+  pack's ~100 per second estimate.
+- Test sends and broadcast triggers (prod-checklist) belong to the user;
+  SMOKE (`protocols/smoke.md`) proves the gate without sending, and does not
+  replace the QA matrix in `references/qa-launch.md`.
+- `cio_delete_api`, allowed after a dry run by `customerio-journeys` and the
+  `customerio` safety lines, is never called (rule 1).
 
 ## Workflow
 1. Intake: `protocols/intake-plus.md` (at most five questions; workspace,

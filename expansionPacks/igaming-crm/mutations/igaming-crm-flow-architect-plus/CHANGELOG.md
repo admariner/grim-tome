@@ -2,6 +2,12 @@
 
 Changes to this skill, newest first. One entry per change: date, what changed, files.
 
+## 1.2.0, revision (2026-11-14)
+- SKILL.md only; no protocol, reference, template or script change. Description now covers workspace health checks, reports and backend briefs, and points generic Customer.io troubleshooting and SDK setup to `customerio-pack`.
+- New "UI deep links" section: one host (`https://fly.customer.io`, all regions), object pages end in `/overview`, links built from one set of builders and checked before delivery.
+- New "Customer.io plugins" section: precedence (hard rules, this skill's protocols, live Customer.io skills, official `customerio` plugin, community `customerio-pack`), a step-to-plugin-skill table, and the overrides that win over the pack (no suppress, destroy, merge or delete of a person; webhook signature over `v0:<timestamp>:<raw body>`; rate limits from `references/platform-implementation.md`; test sends belong to the user; `cio_delete_api` never called).
+- The router's "Smoke test" summary section is removed; SMOKE is still described in the modes table and `protocols/smoke.md`.
+
 ## 1.2.0 (2026-10-24)
 - LIVE-AUDIT accounts for company, staff and test profiles: ask how they are marked, count them apart, one hygiene finding per marker (SKILL.md, protocols/live-audit.md).
 - SMOKE: attribute conditions read back as `attribute_change` are current-value checks, not change history (protocols/smoke.md).
