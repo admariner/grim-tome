@@ -9,6 +9,7 @@ Public changelog for Grimoire's Tome releases
 - The pack keeps upstream invocation names and is manual-only while in beta. References to the rest of pstack (model rule, Cursor-only tool names) were rewritten so each skill stands alone; changes are listed in the pack README.
 - New beta expansion pack: [Anatomy](expansionPacks/anatomy/) by @wheresryan22 (MIT). `/anatomy` turns a one-line idea into a crafted, interactive isometric machine figure, with optional WebGL shaders and a 3D mode. Installed unmodified apart from frontmatter; manual-only while in beta.
 - New beta expansion pack: [iGaming CRM](expansionPacks/igaming-crm/) (MIT). `/igaming-crm-flow-architect-plus` designs casino and sportsbook CRM, builds it in Customer.io as drafts with responsible-gambling exits, smoke-tests the suppression gate with parked synthetic players, and audits a live workspace read-only. It never activates, sends or deletes: the goblins hand you the keys and step back. Manual-only while in beta; the claude.ai account skill stays the source of truth.
+- iGaming CRM pack refreshed from the account skill: it now knows which Customer.io plugin skills to lean on at each step, builds every UI link on one host, and keeps the iGaming rules over the community pack's advice.
 
 ## v1.1.8 (2026-10-03)
 
